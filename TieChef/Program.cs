@@ -4,8 +4,22 @@ using TieChef.Repositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using TieChef.Validators;
+using Serilog;
+
+// Налаштування Serilog
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+try
+{
+    Log.Information("Starting TieChef application");
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Використання Serilog для логування
+builder.Host.UseSerilog();
 
 // Додати сервіси до контейнера.
 
@@ -28,11 +42,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Redis підключення - закоментовано для тестування CRUD без кешу
-// builder.Services.AddStackExchangeRedisCache(options =>
-// {
-//     options.Configuration = builder.Configuration.GetConnectionString("Redis");
-// });
+// Redis підключення
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+});
 
 var app = builder.Build();
 
@@ -73,4 +87,12 @@ app.MapControllerRoute(
 app.MapControllers();
 
 app.Run();
-
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
