@@ -1,26 +1,32 @@
-﻿// using Microsoft.EntityFrameworkCore;
-// using TieChef.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using TieChef.Data;
+using TieChef.Repositories;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using TieChef.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Додати сервіси до контейнера.
+
 builder.Services.AddControllersWithViews();
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<StaffDTOValidator>();
 
-builder.Services.AddControllers();
+// Реєстрація репозиторіїв
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IStaffRepository, StaffRepository>();
+builder.Services.AddScoped<IReceiptRepository, ReceiptRepository>();
+builder.Services.AddScoped<IDiningTableRepository, DiningTableRepository>();
+builder.Services.AddScoped<IDishRepository, DishRepository>();
 
+// Дізнайтеся більше про налаштування Swagger/OpenAPI за посиланням https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-    {
-        Title = "TieChef API",
-        Version = "v1",
-        Description = "API для приложения TieChef"
-    });
-});
+builder.Services.AddSwaggerGen();
 
-// PostgreSQL підключення - закоментовано для тестування CRUD без БД
-// builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Підключення до PostgreSQL
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Redis підключення - закоментовано для тестування CRUD без кешу
 // builder.Services.AddStackExchangeRedisCache(options =>
@@ -32,12 +38,12 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    // Ініціалізація БД - закоментовано для тестування CRUD без БД
-    // using (var scope = app.Services.CreateScope())
-    // {
-    //     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    //     context.Database.EnsureCreated();
-    // }
+    // Ініціалізація БД
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        // context.Database.EnsureCreated(); // Ми будемо використовувати міграції замість цього
+    }
     
     app.UseSwagger();
     app.UseSwaggerUI(c =>

@@ -1,0 +1,1226 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container mt-4">
+    <h2>Admin Dashboard</h2>
+
+    <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="staff-tab" data-bs-toggle="tab" data-bs-target="#staff" type="button" role="tab" aria-controls="staff" aria-selected="true">Staff</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tables-tab" data-bs-toggle="tab" data-bs-target="#tables" type="button" role="tab" aria-controls="tables" aria-selected="false">Tables Management</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="hall-tab" data-bs-toggle="tab" data-bs-target="#hall" type="button" role="tab" aria-controls="hall" aria-selected="false">Hall Layout</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="dishes-tab" data-bs-toggle="tab" data-bs-target="#dishes" type="button" role="tab" aria-controls="dishes" aria-selected="false">Dishes</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="receipts-tab" data-bs-toggle="tab" data-bs-target="#receipts" type="button" role="tab" aria-controls="receipts" aria-selected="false">Receipts History</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="adminTabsContent">
+        <!-- Staff Tab -->
+        <div class="tab-pane fade show active" id="staff" role="tabpanel" aria-labelledby="staff-tab">
+            <div class="mt-3 mb-3">
+                <button class="btn btn-primary" onclick="openAddStaffModal()">Add Staff</button>
+            </div>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Type</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="staffTableBody">
+                    <!-- Staff rows will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tables Management Tab -->
+        <div class="tab-pane fade" id="tables" role="tabpanel" aria-labelledby="tables-tab">
+            <div class="mt-3 mb-3">
+                <button class="btn btn-primary" onclick="openCreateTableModal()">Create Table</button>
+            </div>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Table Number</th>
+                        <th>Seats</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tablesListBody">
+                    <!-- Table rows will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Hall Tab -->
+        <div class="tab-pane fade" id="hall" role="tabpanel" aria-labelledby="hall-tab">
+            <div class="row mt-3">
+                <div class="col-md-2">
+                    <h5>Unplaced Tables</h5>
+                    <div id="unplaced-tables" class="list-group" style="min-height: 200px; border: 1px solid #ccc; padding: 10px;">
+                        <!-- Unplaced tables will be loaded here -->
+                    </div>
+                </div>
+                <div class="col-md-10">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5>Hall Layout</h5>
+                        <button class="btn btn-warning btn-sm" onclick="resetHallLayout()">Reset Layout</button>
+                    </div>
+                    <div id="hall-container" class="hall-container">
+                        <!-- Placed tables will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Receipts Tab -->
+        <div class="tab-pane fade" id="receipts" role="tabpanel" aria-labelledby="receipts-tab">
+            <div class="mt-3 mb-3 row">
+                <div class="col-md-3">
+                    <input type="text" id="filterReceiptId" class="form-control" placeholder="Filter by Receipt ID">
+                </div>
+                <div class="col-md-3">
+                    <select id="filterPaymentStatus" class="form-select">
+                        <option value="">All Statuses</option>
+                        <option value="true">Paid</option>
+                        <option value="false">Unpaid</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100" onclick="loadReceipts()">Filter</button>
+                </div>
+            </div>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Table</th>
+                        <th>Staff</th>
+                        <th>Dishes</th>
+                        <th>Sum</th>
+                        <th>Paid</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="receiptsTableBody">
+                    <!-- Receipts rows will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Dishes Tab -->
+        <div class="tab-pane fade" id="dishes" role="tabpanel" aria-labelledby="dishes-tab">
+            <div class="mt-3 mb-3">
+                <button class="btn btn-primary" onclick="openCreateDishModal()">Add Dish</button>
+            </div>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="dishesTableBody">
+                    <!-- Dishes rows will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Staff Modal -->
+<div class="modal fade" id="addStaffModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Staff</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addStaffForm">
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="staffName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="staffEmail" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="number" class="form-control" id="staffPhone" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select class="form-select" id="staffRole">
+                            <option value="0">Manager</option>
+                            <option value="1">Cook</option>
+                            <option value="2">Waiter</option>
+                            <option value="3">Hostess</option>
+                            <option value="4">Cleaner</option>
+                            <option value="5">Barman</option>
+                            <option value="6">Sommelier</option>
+                            <option value="7">SousChef</option>
+                            <option value="8">Chef</option>
+                            <option value="9">Dishwasher</option>
+                            <option value="10">Accountant</option>
+                            <option value="11">Marketer</option>
+                            <option value="12">Security</option>
+                            <option value="13">Courier</option>
+                            <option value="14">Supplier</option>
+                            <option value="15">Technician</option>
+                            <option value="16">Administrator</option>
+                            <option value="17">Director</option>
+                            <option value="18">Owner</option>
+                            <option value="19">Investor</option>
+                            <option value="20">Partner</option>
+                            <option value="21">Consultant</option>
+                            <option value="22">Auditor</option>
+                            <option value="23">Lawyer</option>
+                            <option value="24">Doctor</option>
+                            <option value="25">Psychologist</option>
+                            <option value="26">Trainer</option>
+                            <option value="27">Nutritionist</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Type</label>
+                        <select class="form-select" id="staffType">
+                            <option value="0">Manager</option>
+                            <option value="1">Cook</option>
+                            <option value="2">Waiter</option>
+                            <option value="3">Hostess</option>
+                            <option value="4">Cleaner</option>
+                            <option value="5">Barman</option>
+                            <option value="6">Sommelier</option>
+                            <option value="7">SousChef</option>
+                            <option value="8">Chef</option>
+                            <option value="9">Dishwasher</option>
+                            <option value="10">Accountant</option>
+                            <option value="11">Marketer</option>
+                            <option value="12">Security</option>
+                            <option value="13">Courier</option>
+                            <option value="14">Supplier</option>
+                            <option value="15">Technician</option>
+                            <option value="16">Administrator</option>
+                            <option value="17">Director</option>
+                            <option value="18">Owner</option>
+                            <option value="19">Investor</option>
+                            <option value="20">Partner</option>
+                            <option value="21">Consultant</option>
+                            <option value="22">Auditor</option>
+                            <option value="23">Lawyer</option>
+                            <option value="24">Doctor</option>
+                            <option value="25">Psychologist</option>
+                            <option value="26">Trainer</option>
+                            <option value="27">Nutritionist</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Salary</label>
+                        <input type="number" class="form-control" id="staffSalary" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveStaff()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create/Edit Table Modal (CRUD) -->
+<div class="modal fade" id="createTableModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Table Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="crudTableId">
+                <div class="mb-3">
+                    <label class="form-label">Table Number</label>
+                    <input type="number" class="form-control" id="crudTableNumber">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Seats</label>
+                    <input type="number" class="form-control" id="crudTableSeats">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveTableCrud()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hall Context Modal (Assign Staff / Receipt) -->
+<div class="modal fade" id="hallContextModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Table Actions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="contextTableId">
+                <h6 id="contextTableTitle">Table #</h6>
+                <div class="mb-3">
+                    <label class="form-label">Assign Staff</label>
+                    <select class="form-select" id="contextTableStaff">
+                        <option value="">-- None --</option>
+                    </select>
+                </div>
+                <hr>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-success" onclick="createReceiptForTable()">Generate Receipt</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveContextChanges()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hall-container {
+        width: 100%;
+        height: 600px;
+        border: 2px dashed #ccc;
+        position: relative;
+        background-color: #f8f9fa;
+        overflow: hidden;
+    }
+
+    .dining-table {
+        position: absolute;
+        background-color: #fff;
+        border: 2px solid #333;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: grab;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        user-select: none;
+        transition: background-color 0.2s;
+        z-index: 10;
+    }
+
+    .dining-table:active {
+        cursor: grabbing;
+        box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+    }
+
+    .dining-table:hover {
+        background-color: #e9ecef;
+    }
+
+    .table-content {
+        text-align: center;
+        pointer-events: none;
+    }
+
+    .unplaced-table-item {
+        cursor: grab;
+        margin-bottom: 5px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 4px;
+    }
+    
+    .remove-table-btn {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background: red;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        line-height: 20px;
+        font-size: 12px;
+        cursor: pointer;
+        display: none;
+        z-index: 20;
+    }
+
+    .dining-table:hover .remove-table-btn {
+        display: block;
+    }
+</style>
+
+<script>
+    let allStaff = [];
+    let allDishes = [];
+    let selectedDishesForReceipt = [];
+    let currentContextTable = null;
+
+    let isDragging = false;
+    let dragEl = null;
+    let dragTable = null;
+    let startX, startY, initialLeft, initialTop;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadStaff();
+        
+        // Load initial data based on active tab
+        document.getElementById('tables-tab').addEventListener('shown.bs.tab', loadTablesList);
+        document.getElementById('hall-tab').addEventListener('shown.bs.tab', loadHallTables);
+        document.getElementById('receipts-tab').addEventListener('shown.bs.tab', loadReceipts);
+        document.getElementById('dishes-tab').addEventListener('shown.bs.tab', loadDishes);
+        
+        // Initial load
+        loadTablesList();
+
+        // Global Drag & Drop Listeners
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging && dragEl) {
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                dragEl.style.left = (initialLeft + dx) + 'px';
+                dragEl.style.top = (initialTop + dy) + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', (e) => {
+            if (isDragging && dragEl && dragTable) {
+                isDragging = false;
+                dragEl.style.zIndex = '';
+                
+                dragTable.x = parseInt(dragEl.style.left);
+                dragTable.y = parseInt(dragEl.style.top);
+                updateTable(dragTable);
+                
+                dragEl = null;
+                dragTable = null;
+            }
+        });
+
+        // Handle Drop on Canvas (from Sidebar)
+        const container = document.getElementById('hall-container');
+        if (container) {
+            container.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            });
+
+            container.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const id = e.dataTransfer.getData('text/plain');
+                if (id) {
+                    fetch(`/api/DiningTable`)
+                        .then(res => res.json())
+                        .then(data => {
+                            // Handle both camelCase and PascalCase
+                            const table = data.find(t => (t.diningTableId || t.DiningTableId) == id);
+                            if (table) {
+                                const rect = container.getBoundingClientRect();
+                                const width = table.width || table.Width || 100;
+                                const height = table.height || table.Height || 100;
+                                
+                                let newX = e.clientX - rect.left - (width / 2);
+                                let newY = e.clientY - rect.top - (height / 2);
+                                
+                                // Boundary checks
+                                if (newX < 0) newX = 0;
+                                if (newY < 0) newY = 0;
+                                
+                                table.x = Math.round(newX);
+                                table.y = Math.round(newY);
+                                
+                                updateTable(table).then(() => loadHallTables());
+                            } else {
+                                console.error('Table not found with ID:', id);
+                            }
+                        })
+                        .catch(err => console.error('Error fetching tables:', err));
+                }
+            });
+        }
+    });
+
+    // --- Staff Functions ---
+
+    function loadStaff() {
+        fetch('/api/Staff')
+            .then(response => response.json())
+            .then(data => {
+                allStaff = data;
+                renderStaffTable(data);
+                updateStaffDropdowns();
+            });
+    }
+
+    function renderStaffTable(data) {
+        const tbody = document.getElementById('staffTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        data.forEach(staff => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${staff.staffId}</td>
+                <td>${staff.fullName}</td>
+                <td>${getRoleName(staff.role)}</td>
+                <td>${getTypeName(staff.type)}</td>
+                <td>${staff.email}</td>
+                <td>${staff.phoneNumber}</td>
+                <td>
+                    <button class="btn btn-sm btn-danger" onclick="deleteStaff(${staff.staffId})">Delete</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function updateStaffDropdowns() {
+        const select = document.getElementById('contextTableStaff');
+        if (!select) return;
+        select.innerHTML = '<option value="">-- None --</option>';
+        allStaff.forEach(staff => {
+            const option = document.createElement('option');
+            option.value = staff.staffId;
+            option.textContent = `${staff.fullName} (${getRoleName(staff.role)})`;
+            select.appendChild(option);
+        });
+    }
+
+    function openAddStaffModal() {
+        var myModal = new bootstrap.Modal(document.getElementById('addStaffModal'));
+        myModal.show();
+    }
+
+    function saveStaff() {
+        const staff = {
+            fullName: document.getElementById('staffName').value,
+            email: document.getElementById('staffEmail').value,
+            phoneNumber: parseInt(document.getElementById('staffPhone').value),
+            role: parseInt(document.getElementById('staffRole').value),
+            type: parseInt(document.getElementById('staffType').value),
+            salary: parseFloat(document.getElementById('staffSalary').value),
+            startWorkDate: new Date().toISOString()
+        };
+
+        fetch('/api/Staff', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(staff)
+        })
+        .then(response => {
+            if (response.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('addStaffModal')).hide();
+                loadStaff();
+                document.getElementById('addStaffForm').reset();
+            } else {
+                response.json().then(err => alert(err.message || 'Error creating staff'));
+            }
+        });
+    }
+
+    function deleteStaff(id) {
+        if (confirm('Are you sure you want to delete this staff member?')) {
+            fetch(`/api/Staff/${id}`, { method: 'DELETE' })
+                .then(response => {
+                    if (response.ok) loadStaff();
+                    else alert('Error deleting staff');
+                });
+        }
+    }
+
+    function getRoleName(roleId) {
+        const roles = ["Manager", "Cook", "Waiter", "Hostess", "Cleaner", "Barman", "Sommelier", "SousChef", "Chef", "Dishwasher", "Accountant", "Marketer", "Security", "Courier", "Supplier", "Technician", "Administrator", "Director", "Owner", "Investor", "Partner", "Consultant", "Auditor", "Lawyer", "Doctor", "Psychologist", "Trainer", "Nutritionist"];
+        return roles[roleId] || roleId;
+    }
+    
+    function getTypeName(typeId) {
+        const types = ["Manager", "Cook", "Waiter", "Hostess", "Cleaner", "Barman", "Sommelier", "SousChef", "Chef", "Dishwasher", "Accountant", "Marketer", "Security", "Courier", "Supplier", "Technician", "Administrator", "Director", "Owner", "Investor", "Partner", "Consultant", "Auditor", "Lawyer", "Doctor", "Psychologist", "Trainer", "Nutritionist"];
+        return types[typeId] || typeId;
+    }
+
+    // --- Tables Management (CRUD) Functions ---
+
+    function loadTablesList() {
+        fetch('/api/DiningTable')
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('tablesListBody');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                data.forEach(table => {
+                    const isPlaced = table.x !== null && table.y !== null;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${table.diningTableId}</td>
+                        <td>${table.tableNumber}</td>
+                        <td>${table.seats}</td>
+                        <td><span class="badge bg-${isPlaced ? 'success' : 'secondary'}">${isPlaced ? 'Placed' : 'Unplaced'}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="openEditTableCrud(${table.diningTableId})">Edit</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteTableCrud(${table.diningTableId})">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+    }
+
+    function openCreateTableModal() {
+        document.getElementById('crudTableId').value = '';
+        document.getElementById('crudTableNumber').value = '';
+        document.getElementById('crudTableSeats').value = '4';
+        var myModal = new bootstrap.Modal(document.getElementById('createTableModal'));
+        myModal.show();
+    }
+
+    function openEditTableCrud(id) {
+        fetch(`/api/DiningTable`) // Ideally get by ID, but we have GetAll
+            .then(res => res.json())
+            .then(data => {
+                const table = data.find(t => t.diningTableId === id);
+                if (table) {
+                    document.getElementById('crudTableId').value = table.diningTableId;
+                    document.getElementById('crudTableNumber').value = table.tableNumber;
+                    document.getElementById('crudTableSeats').value = table.seats;
+                    var myModal = new bootstrap.Modal(document.getElementById('createTableModal'));
+                    myModal.show();
+                }
+            });
+    }
+
+    function saveTableCrud() {
+        const id = document.getElementById('crudTableId').value;
+        const table = {
+            tableNumber: parseInt(document.getElementById('crudTableNumber').value),
+            seats: parseInt(document.getElementById('crudTableSeats').value),
+            // Preserve existing coordinates if editing, or null if new
+            // We need to fetch existing if editing to preserve X/Y, or handle in backend.
+            // For simplicity, we'll fetch first if editing.
+        };
+
+        if (id) {
+            // Update
+            fetch(`/api/DiningTable`)
+                .then(res => res.json())
+                .then(data => {
+                    const existing = data.find(t => t.diningTableId === parseInt(id));
+                    if (existing) {
+                        existing.tableNumber = table.tableNumber;
+                        existing.seats = table.seats;
+                        
+                        fetch(`/api/DiningTable/${id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(existing)
+                        }).then(res => {
+                            if (res.ok) {
+                                bootstrap.Modal.getInstance(document.getElementById('createTableModal')).hide();
+                                loadTablesList();
+                            }
+                        });
+                    }
+                });
+        } else {
+            // Create
+            table.x = null;
+            table.y = null;
+            fetch('/api/DiningTable', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(table)
+            }).then(res => {
+                if (res.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('createTableModal')).hide();
+                    loadTablesList();
+                }
+            });
+        }
+    }
+
+    function deleteTableCrud(id) {
+        if (confirm('Delete this table?')) {
+            fetch(`/api/DiningTable/${id}`, { method: 'DELETE' })
+                .then(res => {
+                    if (res.ok) loadTablesList();
+                });
+        }
+    }
+
+    // --- Hall Layout Functions ---
+
+    function loadHallTables() {
+        fetch('/api/DiningTable')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('hall-container');
+                const sidebar = document.getElementById('unplaced-tables');
+                container.innerHTML = '';
+                sidebar.innerHTML = '';
+
+                data.forEach(table => {
+                    if (table.x !== null && table.y !== null) {
+                        renderPlacedTable(table);
+                    } else {
+                        renderUnplacedTable(table);
+                    }
+                });
+            })
+            .catch(err => {
+                console.error('Error loading tables:', err);
+                alert('Failed to load hall layout.');
+            });
+    }
+
+    function resetHallLayout() {
+        if (confirm('Are you sure you want to reset the layout? All tables will be moved to the unplaced list.')) {
+            fetch('/api/DiningTable/reset', { method: 'POST' })
+                .then(res => {
+                    if (res.ok) {
+                        loadHallTables();
+                    } else {
+                        alert('Failed to reset layout.');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error resetting layout:', err);
+                    alert('Error resetting layout.');
+                });
+        }
+    }
+
+    function renderUnplacedTable(table) {
+        const sidebar = document.getElementById('unplaced-tables');
+        const el = document.createElement('div');
+        el.className = 'unplaced-table-item';
+        el.draggable = true;
+        el.textContent = `Table #${table.tableNumber} (${table.seats} seats)`;
+        el.dataset.id = table.diningTableId;
+        
+        el.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', table.diningTableId.toString());
+            e.dataTransfer.effectAllowed = 'move';
+        });
+
+        sidebar.appendChild(el);
+    }
+
+    function renderPlacedTable(table) {
+        const container = document.getElementById('hall-container');
+        const el = document.createElement('div');
+        el.className = 'dining-table';
+        el.style.left = table.x + 'px';
+        el.style.top = table.y + 'px';
+        el.style.width = table.width + 'px';
+        el.style.height = table.height + 'px';
+        el.id = 'table-' + table.diningTableId;
+        
+        const assignedStaff = allStaff.find(s => s.staffId === table.staffId);
+        const staffName = assignedStaff ? assignedStaff.fullName : 'No Staff';
+
+        el.innerHTML = `
+            <div class="remove-table-btn" onclick="unplaceTable(${table.diningTableId}, event)">x</div>
+            <div class="table-content">
+                <strong>#${table.tableNumber}</strong><br>
+                <small>${table.seats} Seats</small><br>
+                <small class="text-primary">${staffName}</small>
+            </div>
+        `;
+
+        el.addEventListener('mousedown', (e) => {
+            if (e.target.classList.contains('remove-table-btn')) return;
+            isDragging = true;
+            dragEl = el;
+            dragTable = table;
+            startX = e.clientX;
+            startY = e.clientY;
+            initialLeft = el.offsetLeft;
+            initialTop = el.offsetTop;
+            el.style.zIndex = 1000;
+        });
+
+        // Double click to open context menu
+        el.addEventListener('dblclick', () => {
+            openHallContextModal(table);
+        });
+
+        container.appendChild(el);
+    }
+
+    function updateTable(table) {
+        // Ensure we send a clean object with PascalCase ID if needed, or just rely on the fact that we modified the object from the server.
+        // However, to be safe against binding errors, let's ensure the ID property matches what the controller might expect if case-sensitive.
+        // But usually camelCase is fine. The issue might be NaN coordinates.
+        // Let's also handle the response.
+        
+        return fetch(`/api/DiningTable/${table.diningTableId || table.DiningTableId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(table)
+        }).then(res => {
+            if (!res.ok) {
+                console.error('Update failed:', res.status, res.statusText);
+                alert('Failed to update table position. Please try again.');
+                throw new Error('Update failed');
+            }
+            return res;
+        });
+    }
+
+    function unplaceTable(id, event) {
+        event.stopPropagation();
+        fetch(`/api/DiningTable`)
+            .then(res => res.json())
+            .then(data => {
+                const table = data.find(t => t.diningTableId === id);
+                if (table) {
+                    table.x = null;
+                    table.y = null;
+                    updateTable(table).then(() => loadHallTables());
+                }
+            });
+    }
+
+
+
+    function openHallContextModal(table) {
+        currentContextTable = table;
+        document.getElementById('contextTableId').value = table.diningTableId;
+        document.getElementById('contextTableTitle').textContent = `Table #${table.tableNumber}`;
+        document.getElementById('contextTableStaff').value = table.staffId || "";
+        
+        var myModal = new bootstrap.Modal(document.getElementById('hallContextModal'));
+        myModal.show();
+    }
+
+    function saveContextChanges() {
+        if (!currentContextTable) return;
+
+        const staffIdVal = document.getElementById('contextTableStaff').value;
+        currentContextTable.staffId = staffIdVal ? parseInt(staffIdVal) : null;
+
+        updateTable(currentContextTable).then(() => {
+            bootstrap.Modal.getInstance(document.getElementById('hallContextModal')).hide();
+            loadHallTables();
+        });
+    }
+
+    function createReceiptForTable() {
+        if (!currentContextTable) return;
+
+        const receipt = {
+            tableId: currentContextTable.tableNumber,
+            staffId: currentContextTable.staffId,
+            checkId: Math.floor(Math.random() * 10000),
+            wasPaid: false,
+            dishIds: [],
+            sum: 0,
+            paymentDate: null
+        };
+
+        fetch('/api/Receipt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(receipt)
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Receipt created successfully!');
+                bootstrap.Modal.getInstance(document.getElementById('hallContextModal')).hide();
+                var triggerEl = document.querySelector('#receipts-tab')
+                var tab = new bootstrap.Tab(triggerEl)
+                tab.show()
+            } else {
+                alert('Error creating receipt');
+            }
+        });
+    }
+
+    // --- Receipts Functions ---
+
+    function loadReceipts() {
+        // Ensure dishes are loaded
+        const dishPromise = allDishes.length > 0 ? Promise.resolve(allDishes) : fetch('/api/Dish').then(res => res.json());
+
+        dishPromise.then(dishes => {
+            allDishes = dishes;
+            return fetch('/api/Receipt');
+        })
+        .then(response => response.json())
+        .then(data => {
+            const filterId = document.getElementById('filterReceiptId').value.toLowerCase();
+            const filterStatus = document.getElementById('filterPaymentStatus').value;
+
+            const filtered = data.filter(r => {
+                const matchesId = !filterId || (r.checkId && r.checkId.toString().includes(filterId));
+                const matchesStatus = filterStatus === "" || r.wasPaid.toString() === filterStatus;
+                return matchesId && matchesStatus;
+            });
+
+            renderReceiptsTable(filtered);
+        });
+    }
+
+    function renderReceiptsTable(data) {
+        const tbody = document.getElementById('receiptsTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        data.forEach(receipt => {
+            const tr = document.createElement('tr');
+            
+            const staff = allStaff.find(s => s.staffId === receipt.staffId);
+            const staffName = staff ? staff.fullName : (receipt.staffId || '-');
+
+            // Map dish IDs to names
+            let dishNames = '-';
+            if (receipt.dishIds && receipt.dishIds.length > 0) {
+                const names = receipt.dishIds.map(id => {
+                    const dish = allDishes.find(d => d.dishId === id);
+                    return dish ? dish.name : `Unknown(${id})`;
+                });
+                dishNames = names.join(', ');
+            }
+
+            let actionBtn = '';
+            if (!receipt.wasPaid) {
+                actionBtn = `<button class="btn btn-sm btn-success" onclick="openCloseReceiptModal(${receipt.receiptId})">Close Receipt</button>`;
+            }
+
+            tr.innerHTML = `
+                <td>${receipt.checkId || '-'}</td>
+                <td>${receipt.tableId}</td>
+                <td>${staffName}</td>
+                <td>${dishNames}</td>
+                <td>${receipt.sum || 0}</td>
+                <td>
+                    <span class="badge bg-${receipt.wasPaid ? 'success' : 'warning'}">
+                        ${receipt.wasPaid ? 'Paid' : 'Unpaid'}
+                    </span>
+                </td>
+                <td>${receipt.paymentDate ? new Date(receipt.paymentDate).toLocaleString() : '-'}</td>
+                <td>
+                    ${actionBtn}
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // --- Close Receipt Functions ---
+
+    function openCloseReceiptModal(receiptId) {
+        document.getElementById('closeReceiptId').value = receiptId;
+        document.getElementById('closeReceiptSum').value = '0.00';
+        selectedDishesForReceipt = [];
+        renderSelectedDishes();
+        
+        // Load dishes for dropdown
+        fetch('/api/Dish')
+            .then(res => res.json())
+            .then(data => {
+                allDishes = data;
+                const select = document.getElementById('dishSelect');
+                select.innerHTML = '<option value="">Select a dish...</option>';
+                data.forEach(dish => {
+                    const option = document.createElement('option');
+                    option.value = dish.dishId;
+                    option.textContent = `${dish.name} - ${dish.price.toFixed(2)}`;
+                    select.appendChild(option);
+                });
+            });
+
+        var myModal = new bootstrap.Modal(document.getElementById('closeReceiptModal'));
+        myModal.show();
+    }
+
+    function submitCloseReceipt() {
+        const id = document.getElementById('closeReceiptId').value;
+        const sum = parseFloat(document.getElementById('closeReceiptSum').value);
+        
+        if (isNaN(sum)) {
+            alert('Please enter a valid sum.');
+            return;
+        }
+
+        const dishIds = selectedDishesForReceipt.map(d => d.dishId);
+
+        // First fetch the existing receipt to preserve other fields
+        fetch(`/api/Receipt`)
+            .then(res => res.json())
+            .then(data => {
+                const receipt = data.find(r => r.receiptId === parseInt(id));
+                if (receipt) {
+                    receipt.sum = sum;
+                    receipt.dishIds = dishIds;
+                    receipt.wasPaid = true;
+                    receipt.paymentDate = new Date().toISOString();
+
+                    fetch(`/api/Receipt/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(receipt)
+                    }).then(res => {
+                        if (res.ok) {
+                            // Reset table state: find table by number and clear staff
+                            fetch('/api/DiningTable')
+                                .then(res => res.json())
+                                .then(tables => {
+                                    const table = tables.find(t => t.tableNumber === receipt.tableId);
+                                    if (table) {
+                                        table.staffId = null;
+                                        updateTable(table).then(() => {
+                                            bootstrap.Modal.getInstance(document.getElementById('closeReceiptModal')).hide();
+                                            loadReceipts();
+                                            loadHallTables(); // Refresh hall layout to show updated state
+                                        });
+                                    } else {
+                                        // If table not found (e.g. deleted), just close modal
+                                        bootstrap.Modal.getInstance(document.getElementById('closeReceiptModal')).hide();
+                                        loadReceipts();
+                                    }
+                                });
+                        } else {
+                            alert('Failed to close receipt.');
+                        }
+                    });
+                }
+            });
+    }
+
+    function addDishToReceipt() {
+        const select = document.getElementById('dishSelect');
+        const dishId = parseInt(select.value);
+        if (!dishId) return;
+
+        const dish = allDishes.find(d => d.dishId === dishId);
+        if (dish) {
+            selectedDishesForReceipt.push(dish);
+            renderSelectedDishes();
+            updateReceiptSum();
+        }
+        select.value = "";
+    }
+
+    function removeDishFromReceipt(index) {
+        selectedDishesForReceipt.splice(index, 1);
+        renderSelectedDishes();
+        updateReceiptSum();
+    }
+
+    function renderSelectedDishes() {
+        const list = document.getElementById('selectedDishesList');
+        list.innerHTML = '';
+        selectedDishesForReceipt.forEach((dish, index) => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item d-flex justify-content-between align-items-center';
+            li.innerHTML = `
+                ${dish.name} (${dish.price.toFixed(2)})
+                <button class="btn btn-sm btn-danger" onclick="removeDishFromReceipt(${index})">x</button>
+            `;
+            list.appendChild(li);
+        });
+    }
+
+    function updateReceiptSum() {
+        const sum = selectedDishesForReceipt.reduce((acc, dish) => acc + dish.price, 0);
+        document.getElementById('closeReceiptSum').value = sum.toFixed(2);
+    }
+    // --- Dishes Functions ---
+
+    function loadDishes() {
+        fetch('/api/Dish')
+            .then(response => response.json())
+            .then(data => {
+                allDishes = data;
+                renderDishesTable(data);
+            });
+    }
+
+    function renderDishesTable(data) {
+        const tbody = document.getElementById('dishesTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        data.forEach(dish => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${dish.dishId}</td>
+                <td>${dish.name}</td>
+                <td>${dish.description || '-'}</td>
+                <td>${dish.price.toFixed(2)}</td>
+                <td>
+                    <button class="btn btn-sm btn-primary" onclick="openEditDishModal(${dish.dishId})">Edit</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteDish(${dish.dishId})">Delete</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function openCreateDishModal() {
+        document.getElementById('dishId').value = '';
+        document.getElementById('dishName').value = '';
+        document.getElementById('dishDescription').value = '';
+        document.getElementById('dishPrice').value = '';
+        document.getElementById('dishModalTitle').textContent = 'Add Dish';
+        var myModal = new bootstrap.Modal(document.getElementById('createDishModal'));
+        myModal.show();
+    }
+
+    function openEditDishModal(id) {
+        const dish = allDishes.find(d => d.dishId === id);
+        if (dish) {
+            document.getElementById('dishId').value = dish.dishId;
+            document.getElementById('dishName').value = dish.name;
+            document.getElementById('dishDescription').value = dish.description || '';
+            document.getElementById('dishPrice').value = dish.price;
+            document.getElementById('dishModalTitle').textContent = 'Edit Dish';
+            var myModal = new bootstrap.Modal(document.getElementById('createDishModal'));
+            myModal.show();
+        }
+    }
+
+    function saveDish() {
+        const id = document.getElementById('dishId').value;
+        const dish = {
+            name: document.getElementById('dishName').value,
+            description: document.getElementById('dishDescription').value,
+            price: parseFloat(document.getElementById('dishPrice').value)
+        };
+
+        if (id) {
+            dish.dishId = parseInt(id);
+            fetch(`/api/Dish/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dish)
+            }).then(res => {
+                if (res.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('createDishModal')).hide();
+                    loadDishes();
+                } else {
+                    res.text().then(text => alert('Error saving dish: ' + text));
+                }
+            }).catch(err => alert('Network error: ' + err));
+        } else {
+            fetch('/api/Dish', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dish)
+            }).then(res => {
+                if (res.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('createDishModal')).hide();
+                    loadDishes();
+                } else {
+                    res.text().then(text => alert('Error saving dish: ' + text));
+                }
+            }).catch(err => alert('Network error: ' + err));
+        }
+    }
+
+    function deleteDish(id) {
+        if (confirm('Delete this dish?')) {
+            fetch(`/api/Dish/${id}`, { method: 'DELETE' })
+                .then(res => {
+                    if (res.ok) loadDishes();
+                });
+        }
+    }
+</script>
+
+<!-- Close Receipt Modal -->
+<div class="modal fade" id="closeReceiptModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Close Receipt</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="closeReceiptId">
+                
+                <div class="mb-3">
+                    <label class="form-label">Add Dish</label>
+                    <div class="input-group">
+                        <select class="form-select" id="dishSelect">
+                            <option value="">Select a dish...</option>
+                            <!-- Options loaded dynamically -->
+                        </select>
+                        <button class="btn btn-outline-secondary" type="button" onclick="addDishToReceipt()">Add</button>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Selected Dishes</label>
+                    <ul class="list-group" id="selectedDishesList" style="max-height: 150px; overflow-y: auto;">
+                        <!-- Selected dishes list -->
+                    </ul>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Total Sum</label>
+                    <input type="number" class="form-control" id="closeReceiptSum" readonly>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" onclick="submitCloseReceipt()">Confirm Payment</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create/Edit Dish Modal -->
+<div class="modal fade" id="createDishModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dishModalTitle">Add Dish</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="dishId">
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-control" id="dishName" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" id="dishDescription"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Price</label>
+                    <input type="number" step="0.01" class="form-control" id="dishPrice" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveDish()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
