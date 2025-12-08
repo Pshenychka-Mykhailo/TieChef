@@ -23,4 +23,11 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Python.Runtime" Version="2.7.9" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="test/**" />
+    <EmbeddedResource Remove="test/**" />
+    <None Remove="test/**" />
+  </ItemGroup>
+
 </Project>
