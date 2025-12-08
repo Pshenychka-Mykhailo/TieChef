@@ -23,7 +23,28 @@ builder.Host.UseSerilog();
 
 // Додати сервіси до контейнера.
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var errors = context.ModelState
+                .Where(e => e.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray() ?? Array.Empty<string>()
+                );
+
+            var result = new
+            {
+                title = "One or more validation errors occurred.",
+                errors = errors
+            };
+
+            return new Microsoft.AspNetCore.Mvc.BadRequestObjectResult(result);
+        };
+    });
+
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<StaffDTOValidator>();
 

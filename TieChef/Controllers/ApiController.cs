@@ -31,7 +31,6 @@ namespace TieChef.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> CacheTest()
         {
-            // Redis кеш - закоментовано для тестування без БД
             return Ok(new { 
                 message = "Redis кеш відключений для тестування CRUD операцій", 
                 data = new { 
@@ -42,20 +41,13 @@ namespace TieChef.Controllers
                 timestamp = DateTime.UtcNow
             });
 
-            // var cacheKey = "test_key";
-            // var cachedData = await _cache.GetStringAsync(cacheKey);
-            // ... решта коду кешу закоментована
         }
 
         [HttpDelete("cache-test")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ClearCache()
         {
-            // Redis кеш - закоментовано для тестування без БД
             return Ok(new { message = "Redis кеш відключений для тестування CRUD операцій" });
-            
-            // await _cache.RemoveAsync("test_key");
-            // return Ok(new { message = "Cache cleared" });
         }
 
         [HttpGet("database-test")]
